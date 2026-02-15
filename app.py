@@ -18,20 +18,21 @@ def create_app():
     os.makedirs("instance", exist_ok=True)
 
     # -------------------- DB (Render-ready) --------------------
+    # -------------------- DB (Render-ready) --------------------
     db_url = os.getenv("DATABASE_URL")
-if db_url:
-    # Normalize scheme
-    if db_url.startswith("postgres://"):
-        db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-    # Force psycopg v3 driver (avoid psycopg2)
-    if db_url.startswith("postgresql://"):
-        db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if db_url:
+        # Render a veces entrega postgres://
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+        # Fuerza psycopg v3
+        if db_url.startswith("postgresql://"):
+            db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+        app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///instance/local.db"
-
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///instance/local.db"
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
