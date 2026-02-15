@@ -1,0 +1,217 @@
+:root { --bg:#0b1020; --card:#121a33; --text:#e8ecff; --muted:#a9b3d6; --accent:#ffd35a; --accent2:#7cf2c8; }
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;background:linear-gradient(180deg,var(--bg),#050816);color:var(--text)}
+a{color:inherit;text-decoration:none}
+.container{max-width:980px;margin:0 auto;padding:24px}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.3px}
+.badge{font-size:12px;color:#0b1020;background:var(--accent);padding:4px 10px;border-radius:999px;font-weight:700}
+.card{background:rgba(18,26,51,.86);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.col-6{grid-column:span 6}
+.col-12{grid-column:span 12}
+@media (max-width:860px){.col-6{grid-column:span 12}}
+h1{font-size:34px;margin:14px 0 10px}
+h2{font-size:20px;margin:0 0 10px}
+p{color:var(--muted);line-height:1.5;margin:0 0 12px}
+input,select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.22);color:var(--text);outline:none}
+label{font-size:13px;color:var(--muted);display:block;margin:10px 0 6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:620px){.row{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,211,90,.12);color:var(--text);font-weight:800;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--accent),#ffb74a);color:#101522;border:none}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.small{font-size:12px;color:var(--muted)}
+.toast{margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.25);color:var(--text)}
+.kpi{display:flex;gap:12px;align-items:center}
+.kpi .dot{width:10px;height:10px;border-radius:50%;background:var(--accent2)}
+.hr{height:1px;background:rgba(255,255,255,.08);margin:14px 0}
+
+/* ===== Spelling Bee Pro UI ===== */
+.heroTitle{font-size:34px;font-weight:900;margin:0}
+.subtle{color:var(--muted);font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18)}
+.pill strong{color:var(--text)}
+.bigBtn{padding:14px 16px;border-radius:14px;font-size:15px}
+.bigBtn.primary{background:linear-gradient(90deg,var(--accent),#ffb74a);color:#101522;border:none}
+.bigBtn.secondary{background:rgba(124,242,200,.14)}
+.gameBox{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.18)}
+.prompt{font-size:18px;font-weight:900}
+.wordMask{font-size:22px;font-weight:900;letter-spacing:2px}
+.feedbackGood{border-color:rgba(124,242,200,.5);box-shadow:0 0 0 3px rgba(124,242,200,.18)}
+.feedbackBad{border-color:rgba(255,107,107,.6);box-shadow:0 0 0 3px rgba(255,107,107,.20)}
+.shake{animation:shake .25s linear 0s 2}
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
+  100%{transform:translateX(0)}
+}
+
+/* ===== Honeycomb Hex Grid ===== */
+.honeyWrap{display:flex;justify-content:center}
+.honey{--hexW:34px; --hexH:40px; --gap:6px; display:flex; flex-wrap:wrap; width: calc((var(--hexW) + var(--gap)) * 10); gap: var(--gap);}
+.hex{
+  width:var(--hexW);
+  height:var(--hexH);
+  clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%);
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,211,90,.18);
+}
+.hex.mastered{background:rgba(124,242,200,.35); border-color:rgba(124,242,200,.55)}
+.hex.mistake{background:rgba(255,107,107,.18); border-color:rgba(255,107,107,.45)}
+.honey .hex:nth-child(10n+6),
+.honey .hex:nth-child(10n+7),
+.honey .hex:nth-child(10n+8),
+.honey .hex:nth-child(10n+9),
+.honey .hex:nth-child(10n+10){
+  margin-top: 18px; /* offset row for honeycomb feel */
+}
+@media (max-width:860px){
+  .honey{--hexW:30px; --hexH:36px; width: calc((var(--hexW) + var(--gap)) * 9);}
+}
+
+/* ===== Spelling Bee Pro UI ===== */
+.heroTitle{font-size:34px;font-weight:900;margin:0}
+.subtle{color:var(--muted);font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18)}
+.pill strong{color:var(--text)}
+.bigBtn{padding:14px 16px;border-radius:14px;font-size:15px}
+.bigBtn.primary{background:linear-gradient(90deg,var(--accent),#ffb74a);color:#101522;border:none}
+.bigBtn.secondary{background:rgba(124,242,200,.14)}
+.gameBox{padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.18)}
+.prompt{font-size:18px;font-weight:900}
+.wordMask{font-size:22px;font-weight:900;letter-spacing:2px}
+.feedbackGood{border-color:rgba(124,242,200,.5);box-shadow:0 0 0 3px rgba(124,242,200,.18)}
+.feedbackBad{border-color:rgba(255,107,107,.6);box-shadow:0 0 0 3px rgba(255,107,107,.20)}
+.shake{animation:shake .25s linear 0s 2}
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-4px)}
+  100%{transform:translateX(0)}
+}
+
+/* ===== Honeycomb Hex Grid ===== */
+.honeyWrap{display:flex;justify-content:center}
+.honey{--hexW:34px; --hexH:40px; --gap:6px; display:flex; flex-wrap:wrap; width: calc((var(--hexW) + var(--gap)) * 10); gap: var(--gap);}
+.hex{
+  width:var(--hexW);
+  height:var(--hexH);
+  clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%);
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,211,90,.18);
+}
+.hex.mastered{background:rgba(124,242,200,.35); border-color:rgba(124,242,200,.55)}
+.hex.mistake{background:rgba(255,107,107,.18); border-color:rgba(255,107,107,.45)}
+.honey .hex:nth-child(10n+6),
+.honey .hex:nth-child(10n+7),
+.honey .hex:nth-child(10n+8),
+.honey .hex:nth-child(10n+9),
+.honey .hex:nth-child(10n+10){
+  margin-top: 18px; /* offset row for honeycomb feel */
+}
+@media (max-width:860px){
+  .honey{--hexW:30px; --hexH:36px; width: calc((var(--hexW) + var(--gap)) * 9);}
+  #grid{grid-template-columns:repeat(2,1fr)!important;}
+}
+@media (max-width:560px){
+  #grid{grid-template-columns:repeat(1,1fr)!important;}
+}
+
+/* ===== Duolingo-like Dashboard Widgets ===== */
+.dashboardGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+.widget{border:1px solid rgba(255,255,255,.10);background:rgba(0,0,0,.14);border-radius:16px;padding:12px}
+.widget h3{margin:0 0 8px 0;font-size:16px}
+.statRow{display:flex;gap:10px;flex-wrap:wrap}
+.statPill{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18);font-size:13px}
+.statPill b{font-weight:900}
+.mini{font-size:12px;color:var(--muted)}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:8px}
+.day{border-radius:12px;padding:10px 6px;text-align:center;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05)}
+.day .d1{font-size:11px;color:var(--muted)}
+.day .d2{font-size:14px;font-weight:900}
+.day.on{background:rgba(124,242,200,.14);border-color:rgba(124,242,200,.35)}
+.day.today{box-shadow:0 0 0 3px rgba(255,211,90,.18);border-color:rgba(255,211,90,.35)}
+.bars{display:flex;gap:8px;align-items:flex-end;height:86px;margin-top:10px}
+.bar{flex:1;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.barFill{width:100%;background:linear-gradient(180deg,#ffd35a,#7cf2c8);border-radius:12px}
+.barLabel{font-size:10px;color:rgba(255,255,255,.75);margin-top:6px;text-align:center}
+.progressRow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+.progressTrack{flex:1;height:12px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden}
+.progressFill{height:12px;width:0%;background:linear-gradient(90deg,#ffd35a,#7cf2c8)}
+.badgesGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.badgeCard{border-radius:14px;padding:10px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18)}
+.badgeCard .t{font-weight:900}
+.badgeCard.off{opacity:.55}
+@media (max-width:900px){
+  .dashboardGrid{grid-template-columns:1fr}
+}
+
+
+/* ===== Small buttons (contact/info) ===== */
+.btn.small-btn{
+  padding:6px 10px;
+  font-size:13px;
+  border-radius:10px;
+  min-height:auto;
+  line-height:1.2;
+}
+
+
+/* ===== Contact compact (App-style) ===== */
+.contactWrap{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-top:8px;
+}
+
+.contactBtn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  font-size:13px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.16);
+  color:var(--text);
+  text-decoration:none;
+  transition:all .2s ease;
+}
+
+.contactBtn:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.08);
+}
+
+.contactIcon{
+  width:20px;
+  height:20px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  font-size:12px;
+  background:rgba(255,255,255,.12);
+}
+
+.contactBtn.whatsapp .contactIcon{
+  background:#25D366;
+  color:white;
+}
+
+.contactBtn.email .contactIcon{
+  background:#5aa8ff;
+  color:white;
+}
+
+.contactBtn.phone .contactIcon{
+  background:#ffb74a;
+  color:#111;
+}

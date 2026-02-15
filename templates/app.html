@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>App • Spelling Bee</title>
+  <link rel="stylesheet" href="/static/css/styles.css"/>
+  <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+  <div class="container">
+
+    <div class="nav">
+      <div class="brand">🐝 Spelling Bee <span class="badge">Curso {{ grade }}</span></div>
+      <button id="logoutBtn" class="btn ghost">Salir</button>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid">
+      <!-- LEFT -->
+      <div class="card col-6">
+        <h1>Tu progreso</h1>
+
+        {% if not active %}
+          <p>Tu cuenta está creada pero está <b>inactiva</b>. Contacta al administrador para activar tu acceso.</p>
+        {% else %}
+          <p class="small">¡Vamos! Mantén tu racha y domina todas las palabras 🐝✨</p>
+        {% endif %}
+
+        <!-- KPIs -->
+        <div class="statRow" style="margin-top:10px">
+          <div class="statPill">⭐ Level: <b id="kLevel">…</b></div>
+          <div class="statPill">⚡ XP: <b id="kXP">…</b></div>
+          <div class="statPill">🔥 Racha: <b id="kStreak">…</b></div>
+          <div class="statPill">🏆 Mejor: <b id="kBestStreak">…</b></div>
+        </div>
+
+        <div class="dashboardGrid">
+          <!-- streak calendar -->
+          <div class="widget">
+            <h3>Racha (7 días)</h3>
+            <div class="mini">Verde = día con XP. Borde amarillo = hoy.</div>
+            <div id="streakCalendar" class="calendar"></div>
+          </div>
+
+          <!-- weekly xp -->
+          <div class="widget">
+            <h3>XP de la semana</h3>
+            <div class="mini">Entre más barras, más avance.</div>
+            <div id="xpBars" class="bars"></div>
+            <div id="xpLabels" style="display:flex;gap:8px;margin-top:6px"></div>
+          </div>
+
+          <!-- course progress -->
+          <div class="widget">
+            <h3>Progreso del curso</h3>
+            <div class="mini">Dominada = 2 aciertos</div>
+
+            <div class="statRow" style="margin-top:8px">
+              <div class="statPill">✅ Dominadas: <b id="kMastered">0</b></div>
+              <div class="statPill">🔴 Errores: <b id="kMistakes">0</b></div>
+              <div class="statPill">📚 Total: <b id="kTotalWords">0</b></div>
+            </div>
+
+            <div class="progressRow">
+              <span class="mini">Avance</span>
+              <div class="progressTrack"><div id="courseBar" class="progressFill"></div></div>
+              <span class="mini"><b id="coursePct">0%</b></span>
+            </div>
+
+            <div class="hr"></div>
+            <div class="mini">Primeras palabras:</div>
+            <div id="firstWords" class="small"></div>
+          </div>
+
+          <!-- badges -->
+          <div class="widget">
+            <h3>Recompensas</h3>
+            <div class="mini">Gana badges jugando y estudiando.</div>
+            <div id="badgesGrid" class="badgesGrid"></div>
+          </div>
+        </div>
+
+        <div id="toast" class="toast" style="display:none"></div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="card col-6">
+        <h2>Empezar</h2>
+        <p class="small">Elige un modo. Para niños: Bee Quest es el juego principal.</p>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn primary" href="/quest">🐝 Bee Quest</a>
+          <a class="btn" href="/study">📖 Study</a>
+          <a class="btn" href="/words">📚 Palabras</a>
+        </div>
+
+        <div class="hr"></div>
+
+        <h3 style="font-size:16px;margin-bottom:6px">Contacto</h3>
+        <p class="small">¿Preguntas o soporte? Escríbeme:</p>
+        
+        <div class="contactWrap">
+          
+          <!-- EMAIL -->
+           <a class="contactBtn email"
+              href="mailto:dihegobu@gmail.com?subject=Spelling%20Bee%20Soporte&body=Hola%20Diego,%0A%0ATengo%20una%20pregunta%20sobre%20la%20app%20Spelling%20Bee:%0A%0A">
+              <span class="contactIcon">✉️</span>
+              Email
+            </a>
+            
+            <!-- WHATSAPP -->
+          <a class="contactBtn whatsapp"
+             target="_blank"
+             href="https://wa.me/526462763982?text=Hola%20Diego%2C%20tengo%20una%20pregunta%20sobre%20Spelling%20Bee.">
+             <span class="contactIcon">💬</span>
+             WhatsApp
+          </a>
+        </div>
+
+
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

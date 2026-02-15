@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Login • Spelling Bee</title>
+  <link rel="stylesheet" href="/static/css/styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">🐝 Spelling Bee <span class="badge">Login</span></div>
+      <a class="btn ghost" href="/">Inicio</a>
+    </div>
+    <div class="hr"></div>
+
+    <div class="card">
+      <h1>Iniciar sesión</h1>
+      <p>Entra con tu usuario y contraseña. (Para pruebas locales, usa la cuenta invitada que creaste.)</p>
+
+      <form id="loginForm">
+        <label>Usuario</label>
+        <input id="username" required />
+
+        <label>Contraseña</label>
+        <input id="password" type="password" required />
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn primary" type="submit">Entrar</button>
+          <a class="btn" href="/signup">Crear cuenta</a>
+        </div>
+        <div id="toast" class="toast" style="display:none"></div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/login.js"></script>
+</body>
+</html>

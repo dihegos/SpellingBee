@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Study • Spelling Bee</title>
+  <link rel="stylesheet" href="/static/css/styles.css"/>
+  <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">📖 Study <span class="badge">Curso {{ grade }}</span></div>
+      <div style="display:flex;gap:10px">
+        <a class="btn ghost" href="/app">← Volver</a>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="card">
+      <h1>Study Mode</h1>
+      <p class="small">
+        Aquí ya tienes <b>Mis errores</b> y botones para practicar solo esas palabras.
+        Luego metemos tarjetas con traducción, definición, ejemplos y audio.
+      </p>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
+        <a class="btn primary" href="/quest?mode=mistakes">🐝 Practicar mis errores</a>
+        <a class="btn" href="/quest">Practicar todas</a>
+      </div>
+
+      <div id="toast" class="toast" style="display:none"></div>
+
+      <div class="small">Mis errores (top 20):</div>
+      <ol id="mistakes"></ol>
+
+      <div class="hr"></div>
+
+      <h2>Lista (primeras 30)</h2>
+      <p class="small">Esto es solo referencia; luego aquí van tarjetas y búsqueda.</p>
+      <ol id="list"></ol>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/study.js"></script>
+</body>
+</html>
+

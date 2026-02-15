@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Palabras • Spelling Bee</title>
+  <link rel="stylesheet" href="/static/css/styles.css"/>
+  <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">📚 Palabras <span class="badge">Curso {{ grade }}</span></div>
+      <div style="display:flex;gap:10px">
+        <a class="btn ghost" href="/app">← Volver</a>
+        <a class="btn" href="/quest">🐝 Bee Quest</a>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="card">
+      <h1>Lista completa</h1>
+      <p class="small">Toca una palabra para escucharla. Usa “Slow” si quieres más despacio.</p>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
+        <input id="search" placeholder="Buscar palabra…" style="max-width:360px"/>
+        <button class="btn" id="saySlow" type="button">🐢 Slow</button>
+        <button class="btn" id="sayNormal" type="button">🔊 Normal</button>
+      </div>
+
+      <div id="toast" class="toast" style="display:none"></div>
+      <div id="count" class="small"></div>
+
+      <div class="hr"></div>
+
+      <div id="grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/words.js"></script>
+</body>
+</html>

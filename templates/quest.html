@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Bee Quest • Spelling Bee</title>
+  <link rel="stylesheet" href="/static/css/styles.css"/>
+  <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">🐝 Spelling Bee <span class="badge">Bee Quest</span></div>
+      <a class="btn ghost" href="/app">← Volver</a>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="grid">
+      <!-- GAME -->
+      <div class="card col-6">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div class="heroTitle">Bee Quest <span class="badge" id="modeBadge">…</span></div>
+            <div class="subtle">Flujo real: escucha → pide pista → deletrea.</div>
+          </div>
+          <div class="pill" id="bossPill" style="display:none;background:rgba(255,107,107,.15)">
+            👑 <strong>BOSS</strong> (+25)
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+          <div class="pill">🎯 Score: <strong id="score">0</strong></div>
+          <div class="pill">⭐ Level: <strong id="level">1</strong> • XP: <strong id="xp">0</strong></div>
+          <div class="pill">🔥 Racha: <strong id="streak">0</strong></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="subtle">Progreso al siguiente nivel</div>
+          <div style="height:12px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;margin-top:6px">
+            <div id="xpBar" style="height:12px;width:0%;background:linear-gradient(90deg,#ffd35a,#7cf2c8)"></div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="gameBox" id="gameBox">
+          <div class="prompt" id="prompt">🔊 Listen to the word</div>
+          <div class="subtle" id="metaLine">Puedes pedir: definition / sentence / repeat / slow</div>
+
+          <div style="margin-top:10px" class="wordMask" id="wordMask">••••••</div>
+
+          <label style="margin-top:12px">Tu respuesta</label>
+          <input id="answer" placeholder="Escribe la palabra aquí" autocomplete="off"/>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+            <button class="btn bigBtn primary" id="checkBtn" type="button">✅ Submit</button>
+            <button class="btn bigBtn" id="repeatBtn" type="button">🔊 Repeat</button>
+            <button class="btn bigBtn" id="slowBtn" type="button">🐢 Slow</button>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+            <button class="btn bigBtn secondary" id="definitionBtn" type="button">📘 Definition</button>
+            <button class="btn bigBtn secondary" id="sentenceBtn" type="button">📝 Sentence</button>
+            <button class="btn bigBtn" id="hintBtn" type="button">🧠 Hint</button>
+            <button class="btn bigBtn" id="revealBtn" type="button">🔤 Reveal</button>
+          </div>
+
+          <div id="toast" class="toast" style="display:none"></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="subtle">
+          Tip: Si practicas “Mis errores”, el juego te pondrá más esas palabras hasta dominarlas.
+        </div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="card col-6">
+        <h2>Tu progreso (Honeycomb)</h2>
+        <p class="subtle">✅ Dominada = 2 aciertos. 🔴 Si tiene errores, aparece rojita.</p>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+          <div class="pill">✅ Dominadas: <strong id="mastered">0</strong></div>
+          <div class="pill">📚 Total: <strong id="totalWords">0</strong></div>
+          <div class="pill">🔴 Errores: <strong id="mistakes">0</strong></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="honeyWrap">
+          <div class="honey" id="honey"></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Badges</h2>
+        <div id="badges" class="subtle"></div>
+
+        <div class="hr"></div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn bigBtn" href="/study">📖 Study</a>
+          <a class="btn bigBtn primary" href="/quest?mode=mistakes">🐝 Mis errores</a>
+          <a class="btn bigBtn" href="/words">📚 Palabras</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/quest.js"></script>
+</body>
+</html>

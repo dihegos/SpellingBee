@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Registro • Spelling Bee</title>
+  <link rel="stylesheet" href="/static/css/styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">🐝 Spelling Bee <span class="badge">Registro</span></div>
+      <a class="btn ghost" href="/">Inicio</a>
+    </div>
+    <div class="hr"></div>
+
+    <div class="card">
+      <h1>Crear cuenta</h1>
+      <p>Elige tu curso. Para probar en tu compu sin pago, marca <b>Invitado</b> y usa tu código secreto.</p>
+
+      <form id="signupForm">
+        <div class="row">
+          <div>
+            <label>Nombre</label>
+            <input id="first_name" required />
+          </div>
+          <div>
+            <label>Apellido</label>
+            <input id="last_name" required />
+          </div>
+        </div>
+
+        <label>Curso</label>
+        <select id="grade" required>
+          <option value="1">1ro</option>
+          <option value="2">2do</option>
+          <option value="3">3ro</option>
+          <option value="4">4to</option>
+          <option value="5">5to</option>
+          <option value="6">6to</option>
+          <option value="7" selected>7mo</option>
+        </select>
+
+        <div class="row">
+          <div>
+            <label>Usuario (username)</label>
+            <input id="username" required />
+          </div>
+          <div>
+            <label>Contraseña</label>
+            <input id="password" type="password" required />
+          </div>
+        </div>
+
+        <label><input type="checkbox" id="is_guest" /> Soy invitado (sin pago)</label>
+        <div id="guestWrap" style="display:none">
+          <label>Código de invitado</label>
+          <input id="guest_code" placeholder="Tu clave secreta" />
+          <div class="small">Este código se valida en el servidor.</div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn primary" type="submit">Crear / Suscribirse</button>
+          <a class="btn" href="/login">Ya tengo cuenta</a>
+        </div>
+        <div id="toast" class="toast" style="display:none"></div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/static/js/signup.js"></script>
+</body>
+</html>
