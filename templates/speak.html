@@ -1,1 +1,426 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Spelling Bee · Voz (Real)</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <meta name="theme-color" content="#ffcc00">
+
+  <style>
+    /* --- Contraste asegurado (por si tu styles.css trae colores raros) --- */
+    body { background:#ffffff; color:#111111; }
+    a { color:#111111; }
+
+    .wrap { max-width: 860px; margin: 0 auto; padding: 22px; }
+    .topbar { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+    .spacer { flex: 1; }
+
+    .card {
+      border:1px solid #e7e7e7;
+      border-radius:18px;
+      padding:18px;
+      box-shadow: 0 6px 22px rgba(0,0,0,.06);
+      background:#fff;
+    }
+
+    .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .btn {
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid #d8d8d8;
+      background:#ffffff;
+      font-weight:800;
+      letter-spacing:.2px;
+      color:#111;
+    }
+    .btn:disabled { opacity:.55; cursor:not-allowed; }
+
+    .btnPrimary { border-color:#111; }
+    .btnDark { background:#111; color:#fff; border-color:#111; } /* back button / primary dark */
+    .btnGhost { background:transparent; }
+
+    .pill {
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid #eee;
+      background:#fafafa;
+      font-weight:900;
+      color:#111;
+    }
+
+    .title { font-size:28px; font-weight:950; margin: 0 0 10px 0; }
+    .muted { color:#666; }
+    .tiny { font-size: 13px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .ok { color:#0a7a2a; }
+    .bad { color:#b00020; }
+
+    .hr { border:none; border-top:1px solid #eee; margin:14px 0; }
+
+    .bigPrompt {
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.2px;
+      margin: 8px 0 0 0;
+    }
+
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      border:1px solid #ddd;
+      padding:2px 6px;
+      border-radius:8px;
+      background:#fff;
+      color:#111;
+    }
+
+    /* Reveal panel */
+    .reveal {
+      margin-top:10px;
+      border:1px dashed #e2e2e2;
+      border-radius:14px;
+      padding:10px 12px;
+      background:#fbfbfb;
+    }
+    .revealWord {
+      font-size:22px;
+      font-weight:950;
+      letter-spacing:.4px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <div class="topbar">
+      <!-- Botón volver: alto contraste -->
+      <a href="/app" class="btn btnDark" aria-label="Volver al menú">← Volver al menú</a>
+
+      <div class="spacer"></div>
+
+      <span class="pill">🎯 Puntaje: <span id="score">0</span></span>
+      <span class="pill">📌 <span id="idx">0</span>/<span id="total">0</span></span>
+    </div>
+
+    <h1 class="title">🎤 Spelling Bee (modo real)</h1>
+    <p class="muted tiny" style="margin-top:-4px;">
+      Aquí NO se muestra la palabra. Presiona <span class="kbd">🔊</span> para escuchar y luego <span class="kbd">🎤</span> para deletrear: “g o o d”.
+    </p>
+
+    {% if not active %}
+      <p class="bad"><b>Tu cuenta está inactiva.</b> Contacta al admin.</p>
+      <script>throw new Error("Cuenta inactiva");</script>
+    {% endif %}
+
+    <div class="card">
+      <div class="bigPrompt">🎧 Escucha y deletrea</div>
+      <div class="muted tiny">Tip: di letras separadas por espacios (ej: <span class="kbd">b e c a u s e</span>).</div>
+
+      <div class="row" style="margin-top:14px;">
+        <button class="btn btnPrimary" id="btnSpeak" type="button">🔊 Escuchar palabra</button>
+        <button class="btn btnPrimary" id="btnMic" type="button">🎤 Deletrear</button>
+        <button class="btn" id="btnStop" type="button" disabled>⏹ Stop</button>
+
+        <label class="muted tiny" style="display:flex; align-items:center; gap:8px; margin-left:8px;">
+          <input id="autoNext" type="checkbox" checked>
+          Pasar automático al acertar
+        </label>
+
+        <label class="muted tiny" style="display:flex; align-items:center; gap:8px;">
+          <input id="autoSpeakNext" type="checkbox" checked>
+          Escuchar automáticamente la siguiente
+        </label>
+
+        <div class="spacer"></div>
+
+        <button class="btn" id="btnPrev" type="button">←</button>
+        <button class="btn" id="btnNext" type="button">→</button>
+        <button class="btn" id="btnShuffle" type="button">🔀 Mezclar</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <div style="flex:1; min-width: 260px;">
+          <div class="muted">Lo que escuché (raw)</div>
+          <div id="heardRaw" class="mono" style="font-size:16px;">—</div>
+        </div>
+        <div style="flex:1; min-width: 260px;">
+          <div class="muted">Palabra construida</div>
+          <div id="spelled" class="mono" style="font-size:20px; font-weight:950;">—</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="muted">Resultado</div>
+        <div id="result" style="font-size:18px; font-weight:950;">—</div>
+      </div>
+
+      <!-- Reveal (opcional) -->
+      <div class="reveal">
+        <div class="row">
+          <button class="btn btnGhost" id="btnReveal" type="button">👀 Mostrar respuesta</button>
+          <span class="muted tiny">Úsalo solo si te atoras.</span>
+        </div>
+        <div id="revealBox" style="display:none; margin-top:8px;">
+          <div class="muted tiny">La palabra era:</div>
+          <div id="revealWord" class="revealWord">—</div>
+        </div>
+      </div>
+
+      <p class="muted tiny" style="margin-top:12px;">
+        Recomendado: <b>Chrome</b>. iPhone Safari puede ser inestable con SpeechRecognition.
+      </p>
+    </div>
+  </main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function normalizeWord(s) {
+    return (s || "")
+      .toLowerCase()
+      .trim()
+      .replace(/['’`"]/g, "")
+      .replace(/[^a-z]/g, "");
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  // Fonética básica -> letra (para cuando el reconocimiento devuelve "gee", "oh", "dee", etc.)
+  const phonetic = {
+    "a":"a","ay":"a",
+    "b":"b","bee":"b","be":"b",
+    "c":"c","see":"c","sea":"c",
+    "d":"d","dee":"d",
+    "e":"e","ee":"e",
+    "f":"f","ef":"f",
+    "g":"g","gee":"g",
+    "h":"h","aitch":"h",
+    "i":"i","eye":"i",
+    "j":"j","jay":"j",
+    "k":"k","kay":"k",
+    "l":"l","el":"l",
+    "m":"m","em":"m",
+    "n":"n","en":"n",
+    "o":"o","oh":"o",
+    "p":"p","pee":"p",
+    "q":"q","cue":"q","queue":"q",
+    "r":"r","ar":"r","are":"r",
+    "s":"s","ess":"s",
+    "t":"t","tee":"t",
+    "u":"u","you":"u",
+    "v":"v","vee":"v",
+    "w":"w","doubleu":"w","doubleyou":"w",
+    "x":"x","ex":"x",
+    "y":"y","why":"y",
+    "z":"z","zee":"z","zed":"z"
+  };
+
+  function transcriptToSpelling(transcript) {
+    const t = (transcript || "").toLowerCase().trim();
+    const tokens = t.replace(/[-_,.;:]/g, " ").split(/\s+/).filter(Boolean);
+
+    const letters = [];
+    for (const tok of tokens) {
+      if (/^[a-z]$/.test(tok)) { letters.push(tok); continue; }
+      if (phonetic[tok]) { letters.push(phonetic[tok]); continue; }
+    }
+    return letters.join("");
+  }
+
+  // ---------------- State ----------------
+  let words = [];
+  let idx = 0;
+  let correctForThisWord = false;
+
+  async function loadWords() {
+    const r = await fetch("/api/words");
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "No pude cargar palabras");
+
+    words = (data.words || [])
+      .map(w => (typeof w === "string" ? w : (w.word || "")))
+      .filter(Boolean);
+
+    $("total").textContent = String(words.length);
+    if (!words.length) throw new Error("No hay palabras para este grado.");
+  }
+
+  function setWord(i) {
+    idx = Math.max(0, Math.min(i, words.length - 1));
+    $("idx").textContent = String(idx + 1);
+
+    $("heardRaw").textContent = "—";
+    $("spelled").textContent = "—";
+    $("result").textContent = "—";
+    correctForThisWord = false;
+
+    // Oculta reveal al cambiar de palabra
+    $("revealBox").style.display = "none";
+    $("revealWord").textContent = "—";
+
+    $("btnPrev").disabled = (idx === 0);
+    $("btnNext").disabled = (idx === words.length - 1);
+  }
+
+  // ---------------- Stats persistente ----------------
+  async function loadStats() {
+    const r = await fetch("/api/speak/stats");
+    const data = await r.json();
+    $("score").textContent = String(data.score ?? 0);
+  }
+
+  async function markAttempt(isCorrect) {
+    const r = await fetch("/api/speak/mark", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({correct: !!isCorrect})
+    });
+    const out = await r.json();
+    $("score").textContent = String(out.score ?? 0);
+  }
+
+  // ---------------- TTS ----------------
+  function speak(text) {
+    if (!("speechSynthesis" in window)) {
+      $("result").textContent = "Tu navegador no soporta Text-to-Speech.";
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
+
+  // ---------------- Speech Recognition ----------------
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null;
+
+  function recSupported() { return !!SpeechRecognition; }
+
+  function setupRec() {
+    rec = new SpeechRecognition();
+    rec.lang = "en-US";
+    rec.interimResults = true;
+    rec.continuous = false;
+
+    rec.onstart = () => {
+      $("btnMic").disabled = true;
+      $("btnStop").disabled = false;
+      $("result").textContent = "Escuchando deletreo…";
+    };
+
+    rec.onerror = (e) => {
+      $("result").textContent = "Error mic: " + (e.error || "desconocido");
+      $("btnMic").disabled = false;
+      $("btnStop").disabled = true;
+    };
+
+    rec.onend = () => {
+      $("btnMic").disabled = false;
+      $("btnStop").disabled = true;
+    };
+
+    rec.onresult = async (event) => {
+      let transcript = "";
+      for (let k = event.resultIndex; k < event.results.length; k++) {
+        transcript += event.results[k][0].transcript;
+      }
+      transcript = transcript.trim();
+
+      $("heardRaw").textContent = transcript || "—";
+
+      const spelled = transcriptToSpelling(transcript);
+      $("spelled").textContent = spelled || "—";
+
+      const target = normalizeWord(words[idx]);
+      if (!target) return;
+
+      if (spelled && spelled === target) {
+        $("result").innerHTML = `<span class="ok">✅ Correcto</span>`;
+
+        if (!correctForThisWord) {
+          correctForThisWord = true;
+          await markAttempt(true);
+
+          const auto = $("autoNext").checked;
+          if (auto) {
+            setTimeout(() => {
+              if (idx < words.length - 1) {
+                setWord(idx + 1);
+
+                if ($("autoSpeakNext").checked) {
+                  setTimeout(() => speak(words[idx]), 250); // idx ya cambió en setWord
+                }
+              }
+            }, 650);
+          }
+        }
+      } else if (spelled) {
+        $("result").innerHTML =
+          `<span class="bad">❌ Incorrecto</span> <span class="muted">(intenta otra vez)</span>`;
+        await markAttempt(false);
+        correctForThisWord = false;
+      } else {
+        $("result").textContent = "Di letras separadas: “g o o d”.";
+        correctForThisWord = false;
+      }
+    };
+  }
+
+  // ---------------- UI handlers ----------------
+  $("btnSpeak").addEventListener("click", () => speak(words[idx] || ""));
+
+  $("btnMic").addEventListener("click", () => {
+    if (!recSupported()) {
+      $("result").textContent = "SpeechRecognition no está disponible (prueba Chrome).";
+      return;
+    }
+    if (!rec) setupRec();
+    try { rec.start(); }
+    catch (e) { $("result").textContent = "No pude iniciar el micrófono. Recarga e intenta."; }
+  });
+
+  $("btnStop").addEventListener("click", () => { if (rec) rec.stop(); });
+
+  $("btnPrev").addEventListener("click", () => setWord(idx - 1));
+  $("btnNext").addEventListener("click", () => setWord(idx + 1));
+
+  $("btnShuffle").addEventListener("click", () => {
+    words = shuffle(words);
+    setWord(0);
+  });
+
+  $("btnReveal").addEventListener("click", () => {
+    $("revealBox").style.display = ($("revealBox").style.display === "none" ? "block" : "none");
+    $("revealWord").textContent = (words[idx] || "—");
+  });
+
+  // ---------------- Init ----------------
+  (async () => {
+    try {
+      await loadWords();
+      await loadStats();
+      setWord(0);
+
+      // Opcional: al entrar, habla la primera palabra (puede molestar)
+      // speak(words[idx]);
+
+    } catch (e) {
+      $("result").innerHTML = `<span class="bad">Error:</span> ${String(e.message || e)}`;
+    }
+  })();
+</script>
+</body>
+</html>
 
