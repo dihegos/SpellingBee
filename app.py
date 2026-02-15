@@ -3,7 +3,10 @@ import json
 import bcrypt
 import requests
 
-from flask import Flask, request, jsonify, redirect, render_template, url_for, send_from_directory
+from flask import (
+    Flask, request, jsonify, redirect, render_template,
+    url_for, send_from_directory
+)
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager, UserMixin, login_user, logout_user,
@@ -14,10 +17,20 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
-    # Ensure instance/ exists for local sqlite
-    os.makedirs("instance", exist_ok=True)
+    # -------------------- Instance folder (robusto) --------------------
+    # Usa ruta absoluta dentro de tu app (evita conflictos en Render)
+    instance_path = os.path.join(app.root_path, "instance")
 
-    # -------------------- DB (Render-ready) --------------------
+    # Si existe pero NO es directorio (archivo/symlink raro), lo eliminamos
+    if os.path.exists(instance_path) and not os.path.isdir(instance_path):
+        try:
+            os.remove(instance_path)
+        except Exception:
+            # Fallback extremo: usa /tmp si no se puede borrar
+            instance_path = "/tmp/instance"
+
+    os.makedirs(instance_path, exist_ok=True)
+
     # -------------------- DB (Render-ready) --------------------
     db_url = os.getenv("DATABASE_URL")
 
@@ -27,19 +40,24 @@ def create_app():
             db_url = db_url.replace("postgres://", "postgresql://", 1)
 
         # Fuerza psycopg v3
-        if db_url.startswith("postgresql://"):
+        if db_url.startswith("postgresql://") and "+psycopg" not in db_url:
             db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
         app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     else:
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///instance/local.db"
+        # Solo para desarrollo local (o fallback)
+        sqlite_path = os.path.join(instance_path, "local.db")
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + sqlite_path
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    db = SQLAlchemy(app)
 
-    # -------------------- Login --------------------
-    login_manager = LoginManager(app)
+    # -------------------- Extensions --------------------
+    db = SQLAlchemy()
+    db.init_app(app)
+
+    login_manager = LoginManager()
     login_manager.login_view = "login"
+    login_manager.init_app(app)
 
     # -------------------- Settings --------------------
     WORDS_PATH = os.getenv("WORDS_PATH", "words.json")
@@ -74,7 +92,6 @@ def create_app():
     # -------------------- PWA / Manifest --------------------
     @app.get("/manifest.webmanifest")
     def manifest():
-        # Served from static root
         return send_from_directory("static", "manifest.webmanifest")
 
     # -------------------- Pages --------------------
@@ -133,7 +150,6 @@ def create_app():
 
         pw_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
-        # Default: inactive until you activate manually
         user = User(
             first_name=first,
             last_name=last,
@@ -154,11 +170,9 @@ def create_app():
         db.session.add(user)
         db.session.commit()
 
-        # Guest can login immediately
         if user.is_guest:
             return jsonify({"ok": True, "next": "/login"})
 
-        # Normal user: pending activation
         return jsonify({
             "ok": True,
             "next": "/login?pending=1",
@@ -224,7 +238,7 @@ def create_app():
         words = load_words_for_grade(current_user.grade)
         return jsonify({"grade": current_user.grade, "count": len(words), "words": words})
 
-    # -------------------- Translate + hint (backend avoids CORS) --------------------
+    # -------------------- Translate + hint --------------------
     @app.post("/api/translate")
     @login_required
     def api_translate():
@@ -241,6 +255,7 @@ def create_app():
         r = requests.get(url, params={"q": text, "langpair": f"en|{target}"}, timeout=15)
         if not r.ok:
             return jsonify({"error": "Translate failed"}), 502
+
         out = r.json()
         translated = (out.get("responseData") or {}).get("translatedText", "")
         return jsonify({"translated": translated})
@@ -256,7 +271,6 @@ def create_app():
         if not word:
             return jsonify({"error": "Missing word"}), 400
 
-        # Simple offline hint
         if len(word) >= 3:
             masked = word[0] + ("_" * (len(word) - 2)) + word[-1]
         else:
@@ -270,9 +284,9 @@ def create_app():
 
     return app
 
+
 app = create_app()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
     app.run(debug=True, host="0.0.0.0", port=port)
-
