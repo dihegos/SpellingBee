@@ -18,15 +18,12 @@ def create_app():
     app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-me")
 
     # -------------------- Instance folder (robusto) --------------------
-    # Usa ruta absoluta dentro de tu app (evita conflictos en Render)
     instance_path = os.path.join(app.root_path, "instance")
 
-    # Si existe pero NO es directorio (archivo/symlink raro), lo eliminamos
     if os.path.exists(instance_path) and not os.path.isdir(instance_path):
         try:
             os.remove(instance_path)
         except Exception:
-            # Fallback extremo: usa /tmp si no se puede borrar
             instance_path = "/tmp/instance"
 
     os.makedirs(instance_path, exist_ok=True)
@@ -35,17 +32,14 @@ def create_app():
     db_url = os.getenv("DATABASE_URL")
 
     if db_url:
-        # Render a veces entrega postgres://
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-        # Fuerza psycopg v3
         if db_url.startswith("postgresql://") and "+psycopg" not in db_url:
             db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
         app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     else:
-        # Solo para desarrollo local (o fallback)
         sqlite_path = os.path.join(instance_path, "local.db")
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + sqlite_path
 
@@ -62,7 +56,7 @@ def create_app():
     # -------------------- Settings --------------------
     WORDS_PATH = os.getenv("WORDS_PATH", "words.json")
     GUEST_CODE = os.getenv("GUEST_CODE", "")
-    ADMIN_KEY  = os.getenv("ADMIN_KEY", "")  # to activate users in production
+    ADMIN_KEY  = os.getenv("ADMIN_KEY", "")
 
     # -------------------- Models --------------------
     class User(UserMixin, db.Model):
@@ -73,8 +67,22 @@ def create_app():
         password_hash = db.Column(db.LargeBinary, nullable=False)
         grade      = db.Column(db.Integer, nullable=False)  # 1..7
 
-        is_active  = db.Column(db.Boolean, default=False)   # active == allowed to use app
+        is_active  = db.Column(db.Boolean, default=False)
         is_guest   = db.Column(db.Boolean, default=False)
+
+    # Puntaje por voz (persistente)
+    class SpeakScore(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+        grade = db.Column(db.Integer, nullable=False, index=True)
+
+        score = db.Column(db.Integer, nullable=False, default=0)
+        attempts = db.Column(db.Integer, nullable=False, default=0)
+        correct = db.Column(db.Integer, nullable=False, default=0)
+
+        __table_args__ = (
+            db.UniqueConstraint("user_id", "grade", name="uq_user_grade_speak"),
+        )
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -128,6 +136,12 @@ def create_app():
     def words_page():
         return render_template("words.html", grade=current_user.grade)
 
+    # NEW: Spelling Bee Voz (deletreo)
+    @app.get("/speak")
+    @login_required
+    def speak_page():
+        return render_template("speak.html", active=bool(current_user.is_active), grade=current_user.grade)
+
     # -------------------- Auth --------------------
     @app.post("/auth/signup")
     def auth_signup():
@@ -160,7 +174,6 @@ def create_app():
             is_guest=False
         )
 
-        # Guest bypass (no payment)
         if is_guest:
             if not GUEST_CODE or guest_code != GUEST_CODE:
                 return jsonify({"error": "Invalid guest code"}), 403
@@ -204,10 +217,6 @@ def create_app():
     # -------------------- Admin: Activate/Deactivate user --------------------
     @app.post("/admin/activate")
     def admin_activate():
-        """
-        Body: { "admin_key": "...", "username": "student", "active": true/false }
-        Env: ADMIN_KEY must be set on Render.
-        """
         if not ADMIN_KEY:
             return jsonify({"error": "Admin endpoint disabled"}), 404
 
@@ -237,6 +246,34 @@ def create_app():
             return jsonify({"error": "Cuenta inactiva. Contacta al administrador para activación."}), 402
         words = load_words_for_grade(current_user.grade)
         return jsonify({"grade": current_user.grade, "count": len(words), "words": words})
+
+    # -------------------- Speak stats API --------------------
+    @app.get("/api/speak/stats")
+    @login_required
+    def api_speak_stats():
+        row = SpeakScore.query.filter_by(user_id=current_user.id, grade=current_user.grade).first()
+        if not row:
+            return jsonify({"score": 0, "attempts": 0, "correct": 0})
+        return jsonify({"score": row.score, "attempts": row.attempts, "correct": row.correct})
+
+    @app.post("/api/speak/mark")
+    @login_required
+    def api_speak_mark():
+        data = request.get_json(force=True) or {}
+        is_correct = bool(data.get("correct"))
+
+        row = SpeakScore.query.filter_by(user_id=current_user.id, grade=current_user.grade).first()
+        if not row:
+            row = SpeakScore(user_id=current_user.id, grade=current_user.grade, score=0, attempts=0, correct=0)
+            db.session.add(row)
+
+        row.attempts += 1
+        if is_correct:
+            row.correct += 1
+            row.score += 1
+
+        db.session.commit()
+        return jsonify({"score": row.score, "attempts": row.attempts, "correct": row.correct})
 
     # -------------------- Translate + hint --------------------
     @app.post("/api/translate")
